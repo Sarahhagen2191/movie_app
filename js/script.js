@@ -1,30 +1,27 @@
 var searchInput = document.querySelector('.search');
 var cardWrapper = document.querySelector('main');
 
-
-
-
+function noMatch() {
+  cardWrapper.innerHTML = '<p class="no-search">No results found.</p>';
+}
 
 function displayMatches(matches) {
   cardWrapper.innerHTML = '';
 
-
-  if (!matches.length === 0) {
+  if (!matches.length) {
     noMatch();
   }
 
-
   for (var matchObj of matches) {
-    cardWrapper.insertAdjacentHTML('beforeend','
-      < div class= "movie-card" style = "background-image": linear - gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${ matchObj.movie_image }); ">
-        < h3 > ${ matchObj.title }</h3 >
-  <p>${matchesOb.description}</p>
-  <a href="${matchObj.imbd_link}" target="_blank">View More Info Here</a>
-</div >
-      ');
+    cardWrapper.insertAdjacentHTML('beforeend', `
+    <div class="movie-card" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${matchObj.movie_image});">
+      <h3>${matchObj.title}</h3>
+      <p>${matchObj.description}</p>
+      <a href="${matchObj.imdb_link}" target="_blank">View More Info Here</a>
+    </div>
+    `);
   }
 }
-
 
 function fetchMovies(event) {
   var keyCode = event.keyCode;
@@ -33,19 +30,20 @@ function fetchMovies(event) {
   if (keyCode === 13 && searchText) {
     var matches = [];
 
-    for (var movieObj of movieData) {
+    fetch(`https://www.omdbapi.com/?apikey=20dc4c7f&t=${searchText}`).then(function (responseObj) {
+      var dataPromise = responseObj.json();
 
-      if (movieObj.title.toLowerCase().includes(searchText)) {
-        matches.push(movieObj);
-
-      }
-    }
+      dataPromise.then(function (data) {
+        console.log(data);
+      });
+    });
 
     searchInput.value = '';
     displayMatches(matches);
+
+
   }
 }
-
 
 function init() {
   searchInput.addEventListener('keydown', fetchMovies);
@@ -53,14 +51,3 @@ function init() {
 
 init();
 
-
-
-
-
-
-
-/* <div class="movie-card">
-  <h3>Movie Title</h3>
-  <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
-  <a href="#">View More Info Here</a>
-</div> */
